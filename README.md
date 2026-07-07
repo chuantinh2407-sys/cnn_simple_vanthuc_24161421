@@ -1,31 +1,37 @@
 # CNN Simple Accelerator on RISC-V SoC
 
-## 1. Giới thiệu dự án
+![Language](https://img.shields.io/badge/Language-Verilog-blue)
+![Firmware](https://img.shields.io/badge/Firmware-C-green)
+![CPU](https://img.shields.io/badge/CPU-RISC--V-orange)
+![Status](https://img.shields.io/badge/Status-Learning_Project-yellow)
 
-`cnn_simple_vanthuc_24161421` là một project mô phỏng hệ thống SoC đơn giản sử dụng CPU RISC-V kết hợp với một khối phần cứng CNN Accelerator được viết bằng Verilog.
+## 1. Project Overview
 
-Mục tiêu của project là xây dựng một mô hình cơ bản cho việc tăng tốc tính toán CNN bằng phần cứng, trong đó CPU RISC-V đóng vai trò điều khiển, còn khối CNN thực hiện phép tính tích chập đơn giản trên dữ liệu đầu vào.
+`cnn_simple_vanthuc_24161421` is a simple RISC-V SoC project that integrates a custom CNN accelerator written in Verilog.
 
-Dự án này phù hợp cho việc học và thực hành các nội dung:
+The main purpose of this project is to demonstrate how a RISC-V CPU can communicate with a hardware accelerator through memory-mapped registers. In this design, the CPU is responsible for controlling the system, while the CNN accelerator performs a simple convolution operation.
 
-- Thiết kế SoC đơn giản
-- Giao tiếp CPU với ngoại vi qua bus
-- Thiết kế phần cứng bằng Verilog
-- Viết firmware C chạy trên CPU RISC-V
-- Mô phỏng luồng dữ liệu giữa phần mềm và phần cứng
-- Hiểu nguyên lý cơ bản của CNN trong xử lý ảnh và AI
+This project is designed for learning and experimentation with:
+
+- RISC-V SoC design
+- Verilog hardware design
+- Wishbone bus communication
+- Memory-mapped I/O
+- Firmware development in C
+- Hardware/software co-design
+- Basic CNN acceleration using custom hardware
 
 ---
 
-## 2. CNN là gì?
+## 2. What is CNN?
 
-CNN là viết tắt của **Convolutional Neural Network**, hay tiếng Việt là **mạng nơ-ron tích chập**.
+CNN stands for **Convolutional Neural Network**.
 
-CNN là một loại mạng học sâu thường dùng trong các bài toán xử lý ảnh, nhận dạng hình ảnh, phân loại vật thể, nhận dạng chữ viết, phát hiện khuôn mặt và nhiều ứng dụng AI khác.
+A CNN is a type of deep learning model commonly used in image processing, object recognition, classification, face detection, and many other artificial intelligence applications.
 
-Ý tưởng chính của CNN là dùng các bộ lọc nhỏ, gọi là **kernel** hoặc **filter**, trượt trên ma trận dữ liệu đầu vào để trích xuất đặc trưng.
+The core operation of a CNN is called **convolution**. In convolution, a small matrix called a **kernel** or **filter** slides over an input matrix and performs multiply-and-accumulate operations.
 
-Ví dụ, với ảnh đầu vào dạng ma trận:
+For example, an input matrix may look like this:
 
 ```text
 1 2 3 4 5
@@ -34,40 +40,50 @@ Ví dụ, với ảnh đầu vào dạng ma trận:
 1 2 3 4 5
 1 2 3 4 5
 ```
-và kernel 3x3:
+
+A simple 3x3 kernel may look like this:
+
+```text
+1 0 1
+0 1 0
+1 0 1
 ```
--1 0 1
--1 0 1
--1 0 1
-```
-phép tích chập sẽ lấy từng vùng 3x3 của ảnh đầu vào, nhân với kernel, sau đó cộng lại để tạo ra một giá trị đầu ra.
 
-Trong project này, mô hình CNN được đơn giản hóa để dễ hiểu và dễ mô phỏng trên phần cứng.
+The CNN accelerator takes each 3x3 region of the input, multiplies it with the kernel, and sums the results to generate one output value.
 
-## 3. Mục tiêu của project
+In this project, the CNN model is simplified so that the hardware behavior is easy to understand, simulate, and debug.
 
-Project này được xây dựng với các mục tiêu chính:
+---
 
-Thiết kế một khối CNN Accelerator đơn giản bằng Verilog.
-Kết nối khối CNN vào hệ thống SoC thông qua bus.
-Viết firmware C để CPU nạp dữ liệu input và kernel vào CNN.
-Cho CNN tính toán kết quả tích chập.
-CPU đọc kết quả output từ CNN.
-Mô phỏng toàn bộ hệ thống để quan sát luồng dữ liệu.
+## 3. Project Objectives
 
-## 4. Kiến trúc tổng quan hệ thống
+The main objectives of this project are:
 
-Hệ thống gồm các thành phần chính:
-```
+1. Design a simple CNN accelerator in Verilog.
+2. Connect the CNN accelerator to a RISC-V SoC.
+3. Use a Wishbone-based bus interface for communication.
+4. Write C firmware to control the accelerator.
+5. Load input data and kernel data from software.
+6. Start the CNN computation from firmware.
+7. Read the output results back to the CPU.
+8. Observe and verify the data flow through simulation.
+
+---
+
+## 4. System Architecture
+
+The system contains the following main components:
+
+```text
 +------------------+
-|   Firmware C     |
-|  chạy trên CPU   |
+|    Firmware C    |
+|  running on CPU  |
 +--------+---------+
          |
          v
 +------------------+
 |   RISC-V CPU     |
-|   VexRiscv       |
+|    VexRiscv      |
 +--------+---------+
          |
          v
@@ -79,22 +95,28 @@ Hệ thống gồm các thành phần chính:
          |                      |
          v                      v
 +------------------+    +------------------+
-|      RAM         |    | CNN Accelerator  |
-| Instruction/Data |    |  Verilog module  |
+|       RAM        |    | CNN Accelerator  |
+| Instruction/Data |    |  Verilog Module  |
 +------------------+    +------------------+
 ```
-CPU RISC-V không trực tiếp tính toán CNN. CPU chỉ làm nhiệm vụ:
 
-ghi dữ liệu input vào CNN
-ghi kernel vào CNN
-gửi tín hiệu start
-chờ CNN tính xong
-đọc kết quả output
+The RISC-V CPU does not directly compute the CNN operation. Instead, it controls the accelerator by writing and reading memory-mapped registers.
 
-Khối CNN Accelerator sẽ đảm nhiệm phần tính toán chính.
+The CPU performs these tasks:
 
-## 5. Cấu trúc thư mục
-```
+- Write input data to the CNN accelerator
+- Write kernel data to the CNN accelerator
+- Send the start signal
+- Wait for the accelerator to finish
+- Read the output data back
+
+The CNN accelerator performs the actual convolution computation in hardware.
+
+---
+
+## 5. Repository Structure
+
+```text
 cnn_simple_vanthuc_24161421/
 │
 ├── firmware/
@@ -125,23 +147,33 @@ cnn_simple_vanthuc_24161421/
 ├── README.md
 └── .gitignore
 ```
-Ý nghĩa các thư mục:
-| Thư mục                 | Chức năng                                            |
-| ----------------------- | ---------------------------------------------------- |
-| `firmware/`             | Chứa chương trình C chạy trên CPU RISC-V             |
-| `rtl/`                  | Chứa các module Verilog của phần cứng                |
-| `sim/`                  | Chứa file mô phỏng hệ thống                          |
-| `tb/`                   | Chứa testbench kiểm thử                              |
-| `model/`                | Có thể chứa mô hình tham chiếu hoặc dữ liệu kiểm thử |
-| `scripts/`              | Chứa script hỗ trợ build, chạy mô phỏng              |
-| `third_party/vexriscv/` | Chứa CPU VexRiscv hoặc thành phần phụ thuộc          |
-| `Makefile`              | Tự động hóa quá trình build và chạy project          |
+
+Folder description:
+
+| Folder | Description |
+|---|---|
+| `firmware/` | C firmware running on the RISC-V CPU |
+| `rtl/` | Verilog RTL source files |
+| `sim/` | Simulation files |
+| `tb/` | Testbench files |
+| `model/` | Reference models or test data |
+| `scripts/` | Build or helper scripts |
+| `third_party/vexriscv/` | VexRiscv CPU or external dependencies |
+| `Makefile` | Build and simulation automation |
+
+---
 
 ## 6. Memory Map
 
-Khối CNN được ánh xạ vào vùng địa chỉ:
+The CNN accelerator is mapped to the following base address:
+
+```c
 #define CNN_BASE 0x40000000
-Các thanh ghi điều khiển của CNN:
+```
+
+CNN register definitions:
+
+```c
 #define CNN_CTRL          (*(volatile unsigned int *)(CNN_BASE + 0x00))
 #define CNN_STATUS        (*(volatile unsigned int *)(CNN_BASE + 0x04))
 #define CNN_INPUT_INDEX   (*(volatile unsigned int *)(CNN_BASE + 0x08))
@@ -150,59 +182,75 @@ Các thanh ghi điều khiển của CNN:
 #define CNN_KERNEL_DATA   (*(volatile unsigned int *)(CNN_BASE + 0x14))
 #define CNN_OUTPUT_INDEX  (*(volatile unsigned int *)(CNN_BASE + 0x18))
 #define CNN_OUTPUT_DATA   (*(volatile unsigned int *)(CNN_BASE + 0x1C))
-
-Bảng ý nghĩa:
-| Thanh ghi          | Địa chỉ offset | Chức năng                     |
-| ------------------ | -------------: | ----------------------------- |
-| `CNN_CTRL`         |         `0x00` | Gửi lệnh start cho CNN        |
-| `CNN_STATUS`       |         `0x04` | Kiểm tra trạng thái done/busy |
-| `CNN_INPUT_INDEX`  |         `0x08` | Chọn vị trí input cần ghi     |
-| `CNN_INPUT_DATA`   |         `0x0C` | Ghi dữ liệu input             |
-| `CNN_KERNEL_INDEX` |         `0x10` | Chọn vị trí kernel cần ghi    |
-| `CNN_KERNEL_DATA`  |         `0x14` | Ghi dữ liệu kernel            |
-| `CNN_OUTPUT_INDEX` |         `0x18` | Chọn vị trí output cần đọc    |
-| `CNN_OUTPUT_DATA`  |         `0x1C` | Đọc kết quả output            |
-
-## 7. Luồng hoạt động của firmware
-
-Firmware C thực hiện các bước sau:
-  
-Bước 1: Khởi tạo dữ liệu input 5x5
-Bước 2: Khởi tạo kernel 3x3
-Bước 3: Ghi input vào CNN Accelerator
-Bước 4: Ghi kernel vào CNN Accelerator
-Bước 5: Gửi tín hiệu start
-Bước 6: Chờ CNN báo done
-Bước 7: Đọc 9 giá trị output
-Bước 8: Lưu kết quả vào result_store
-
-Luồng dữ liệu:
 ```
+
+Register description:
+
+| Register | Offset | Description |
+|---|---:|---|
+| `CNN_CTRL` | `0x00` | Control register used to start CNN computation |
+| `CNN_STATUS` | `0x04` | Status register used to check busy/done state |
+| `CNN_INPUT_INDEX` | `0x08` | Selects the input element index |
+| `CNN_INPUT_DATA` | `0x0C` | Writes input data to the selected index |
+| `CNN_KERNEL_INDEX` | `0x10` | Selects the kernel element index |
+| `CNN_KERNEL_DATA` | `0x14` | Writes kernel data to the selected index |
+| `CNN_OUTPUT_INDEX` | `0x18` | Selects the output element index |
+| `CNN_OUTPUT_DATA` | `0x1C` | Reads output data from the selected index |
+
+---
+
+## 7. Firmware Flow
+
+The firmware controls the CNN accelerator using memory-mapped registers.
+
+Main firmware flow:
+
+```text
+Step 1: Initialize a 5x5 input matrix
+Step 2: Initialize a 3x3 kernel matrix
+Step 3: Write input data to the CNN accelerator
+Step 4: Write kernel data to the CNN accelerator
+Step 5: Send the start command
+Step 6: Wait until the CNN accelerator reports done
+Step 7: Read 9 output values
+Step 8: Store the results in result_store[9]
+```
+
+Data flow:
+
+```text
 main.c
   |
-  | ghi input, kernel
+  | writes input and kernel
   v
-CNN registers
+CNN memory-mapped registers
   |
-  | CNN core xử lý
+  | CNN core performs convolution
   v
 Output buffer
   |
-  | CPU đọc lại
+  | CPU reads result
   v
 result_store[9]
 ```
-## 8. Công thức tích chập
 
-Với input 5x5 và kernel 3x3, output tạo ra có kích thước:
+---
 
+## 8. Convolution Formula
+
+For a 5x5 input and a 3x3 kernel, the output size is:
+
+```text
 Output size = Input size - Kernel size + 1
             = 5 - 3 + 1
             = 3
-Do đó output là ma trận 3x3, gồm 9 giá trị.
-
-Công thức tổng quát:
 ```
+
+Therefore, the output is a 3x3 matrix containing 9 values.
+
+The general formula is:
+
+```text
 output[y][x] =
     input[y+0][x+0] * kernel[0][0] +
     input[y+0][x+1] * kernel[0][1] +
@@ -214,235 +262,306 @@ output[y][x] =
     input[y+2][x+1] * kernel[2][1] +
     input[y+2][x+2] * kernel[2][2]
 ```
-## 9. Ý nghĩa kết quả
 
-Trong mô hình hiện tại, kết quả tính ra có thể là các giá trị giống nhau, ví dụ toàn bộ output đều bằng 6.
+---
 
-Điều này không có nghĩa là CNN bị sai. Nguyên nhân thường là do:
+## 9. Meaning of the Output Result
 
-input được lặp lại theo từng hàng
-kernel đơn giản
-dữ liệu đầu vào có quy luật đều
-chưa có bias, activation, pooling hoặc nhiều kernel
+In the current simple model, the output values may be the same, for example:
 
-Kết quả 6 thể hiện rằng tại mỗi vùng 3x3, phép nhân chập giữa input và kernel cho ra cùng một tổng.
+```text
+6 6 6
+6 6 6
+6 6 6
+```
 
-Trong thực tế, nếu input là ảnh thật, các giá trị output sẽ khác nhau và thể hiện các đặc trưng khác nhau của ảnh như cạnh, vùng sáng, vùng tối hoặc hình dạng.
+This does not necessarily mean the CNN accelerator is incorrect.
 
-## 10. Các module phần cứng chính
+The reason may be that:
 
-### 10.1. cnn_core.v
+- The input matrix has repeated patterns
+- The kernel is simple
+- Each 3x3 region produces the same sum
+- There is no bias, activation function, pooling, or multiple filters yet
 
-Đây là module xử lý chính của CNN.
+In this project, the output value represents the result of a convolution operation between one 3x3 input region and the 3x3 kernel.
 
-Chức năng:
+In a real CNN application, if the input is an actual image, different output values can represent different image features such as edges, brightness, shapes, or patterns.
 
-lưu input
-lưu kernel
-thực hiện phép nhân và cộng
-sinh output 3x3
-báo trạng thái done sau khi tính xong
+---
 
-### 10.2. wb_cnn_mini.v
+## 10. Main Hardware Modules
 
-Đây là module wrapper giúp CNN giao tiếp với bus Wishbone.
+### 10.1. `cnn_core.v`
 
-Chức năng:
+This is the main CNN computation module.
 
-nhận tín hiệu đọc/ghi từ CPU
-ánh xạ thanh ghi CNN
-chuyển dữ liệu từ bus vào CNN core
-trả dữ liệu output về CPU
+Responsibilities:
 
-### 10.3. wb_decoder.v
+- Store input data
+- Store kernel data
+- Perform multiply-and-accumulate operations
+- Generate the 3x3 output matrix
+- Assert the done signal when computation is complete
 
-Module giải mã địa chỉ bus.
+### 10.2. `wb_cnn_mini.v`
 
-Chức năng:
+This module is the Wishbone wrapper for the CNN core.
 
-xác định địa chỉ nào thuộc RAM
-xác định địa chỉ nào thuộc CNN
-điều hướng tín hiệu bus tới đúng ngoại vi
+Responsibilities:
 
-### 10.4. wb_ram_dp.v
+- Receive read/write transactions from the CPU
+- Decode CNN register accesses
+- Transfer input and kernel data to the CNN core
+- Return output data to the CPU
 
-RAM hai cổng dùng cho instruction/data memory.
+### 10.3. `wb_decoder.v`
 
-Chức năng:
+This module decodes the CPU address bus.
 
-lưu chương trình firmware
-lưu dữ liệu tạm
-cho phép CPU truy cập bộ nhớ trong quá trình mô phỏng
+Responsibilities:
 
-## 11. Build và chạy mô phỏng
+- Detect RAM address range
+- Detect CNN accelerator address range
+- Route bus transactions to the correct target
 
-Có thể sử dụng Makefile để build và chạy project.
+### 10.4. `wb_ram_dp.v`
 
-Ví dụ:
+This is a dual-port RAM module.
+
+Responsibilities:
+
+- Store firmware instructions
+- Store data used by the CPU
+- Support instruction and data memory access during simulation
+
+---
+
+## 11. Build and Run Simulation
+
+You can use the Makefile to build and run the project.
+
+Example:
+
+```bash
 make clean
+make build
 make sim
-make wave
+```
 
-make all
+Or run the simulation script directly:
 
-Sau khi chạy mô phỏng, có thể quan sát:
+```bash
+python3 sim/sim.py
+```
 
-CPU ghi input vào CNN
-CPU ghi kernel vào CNN
-tín hiệu start
-trạng thái done
-dữ liệu output trả về CPU
+If the firmware needs to be built separately:
 
-## 12. Kết quả mong đợi
+```bash
+make firmware
+```
 
-Với input và kernel mẫu, hệ thống sẽ sinh ra 9 giá trị output:
-output[0]
-output[1]
-output[2]
-...
-output[8]
+During simulation, you can observe:
 
-Các giá trị này được firmware đọc về và lưu trong:
+- CPU writing input data to the CNN accelerator
+- CPU writing kernel data to the CNN accelerator
+- Start signal being asserted
+- CNN computation process
+- Done status
+- Output data being read by the CPU
+
+---
+
+## 12. Expected Result
+
+For the sample input and kernel, the accelerator generates 9 output values.
+
+The firmware stores the results in:
+
+```c
 volatile int result_store[9];
+```
 
-Có thể kiểm tra kết quả bằng waveform hoặc log mô phỏng.
+The result can be verified using:
 
-## 13. Ý nghĩa học thuật của project
+- Simulation log
+- Waveform viewer
+- Register readback
+- Output memory inspection
 
-Project này giúp làm rõ mối liên hệ giữa phần mềm và phần cứng trong một hệ thống SoC.
+---
 
-Thông qua project, có thể hiểu được:
+## 13. Educational Value
 
-CPU không nhất thiết phải tự xử lý mọi phép toán
-Các tác vụ nặng có thể được đẩy sang phần cứng chuyên dụng
-Memory-mapped I/O giúp CPU điều khiển ngoại vi giống như ghi/đọc biến trong C
-CNN có thể được tăng tốc bằng phần cứng
-Verilog có thể dùng để thiết kế các bộ tăng tốc AI đơn giản
+This project demonstrates the relationship between software and hardware in a simple SoC system.
 
-## 14. Hướng phát triển trong tương lai
+Through this project, we can understand that:
 
-Project hiện tại mới là phiên bản đơn giản. Trong tương lai có thể mở rộng theo các hướng sau:
+- A CPU does not need to perform every computation by itself
+- Heavy computation can be offloaded to a hardware accelerator
+- Memory-mapped I/O allows software to control hardware modules
+- A CNN operation can be implemented in hardware
+- Verilog can be used to build a basic AI accelerator
+- Firmware and RTL must work together correctly in a complete system
 
-### 14.1. Mở rộng kích thước input
+---
 
-Hiện tại input chỉ là 5x5. Có thể mở rộng lên:
+## 14. Current Limitations
 
+This project is currently a simplified learning version.
+
+Current limitations include:
+
+- Only supports 5x5 input
+- Only supports 3x3 kernel
+- Only one convolution layer
+- No bias support
+- No activation function
+- No ReLU
+- No pooling layer
+- No real image input yet
+- No multiple filters
+- No hardware pipeline optimization
+- Mainly designed for simulation and learning
+
+---
+
+## 15. Future Development
+
+This project can be extended in several directions.
+
+### 15.1. Larger Input Size
+
+The current input size is 5x5. Future versions may support:
+
+```text
 8x8
 16x16
-28x28, tương tự ảnh MNIST
-32x32, tương tự ảnh CIFAR nhỏ
+28x28
+32x32
+```
 
-### 14.2. Hỗ trợ nhiều kernel
+A 28x28 input would be useful for simple handwritten digit recognition experiments such as MNIST-like data.
 
-Phiên bản hiện tại chỉ dùng một kernel 3x3. Có thể mở rộng để hỗ trợ nhiều kernel nhằm trích xuất nhiều đặc trưng khác nhau.
+### 15.2. Multiple Kernels
 
-Ví dụ:
+The current design only uses one 3x3 kernel.
 
-Kernel 1: phát hiện cạnh ngang
-Kernel 2: phát hiện cạnh dọc
-Kernel 3: phát hiện vùng sáng
-Kernel 4: phát hiện vùng tối
+Future versions may support multiple kernels to extract different features.
 
-### 14.3. Thêm bias và activation function
+Example:
 
-CNN thực tế thường có thêm:
+```text
+Kernel 1: Horizontal edge detection
+Kernel 2: Vertical edge detection
+Kernel 3: Brightness detection
+Kernel 4: Pattern detection
+```
 
+### 15.3. Bias and Activation Function
+
+A real CNN usually applies bias and an activation function after convolution.
+
+Example:
+
+```text
 output = convolution + bias
+```
 
-Sau đó đi qua hàm kích hoạt như:
+Then the output may pass through ReLU:
 
+```text
 ReLU(x) = max(0, x)
+```
 
-Có thể thêm module ReLU để mô hình gần với CNN thật hơn.
+Adding ReLU would make the accelerator closer to a real CNN layer.
 
-### 14.4. Thêm pooling layer
+### 15.4. Pooling Layer
 
-Pooling giúp giảm kích thước dữ liệu và giữ lại đặc trưng quan trọng.
+Pooling can reduce the size of feature maps while preserving important information.
 
-Có thể thêm:
+Future versions may support:
 
-Max Pooling
-Average Pooling
+- Max pooling
+- Average pooling
 
-### 14.5. Tối ưu hiệu năng phần cứng
+### 15.5. Hardware Optimization
 
-Phiên bản đầu có thể tính toán tuần tự. Trong tương lai có thể tối ưu bằng:
+The current implementation can be improved for performance.
 
-pipeline
-parallel multiply-accumulate
-nhiều MAC unit
-buffer dữ liệu
-giảm số chu kỳ tính toán
+Possible optimizations:
 
-### 14.6. Tích hợp với LiteX SoC
+- Pipelined architecture
+- Parallel MAC units
+- Multiple convolution units
+- Input buffering
+- Output buffering
+- Reduced computation latency
 
-Có thể phát triển project thành một peripheral chuẩn trong LiteX, cho phép CPU truy cập CNN thông qua CSR hoặc Wishbone bus.
+### 15.6. LiteX Integration
 
-### 14.7. Chạy trên FPGA thật
+The CNN accelerator can be developed into a standard LiteX-compatible peripheral.
 
-Sau khi mô phỏng ổn định, project có thể được đưa lên FPGA thật để kiểm chứng phần cứng.
+Possible integration methods:
 
-Các bước tương lai:
+- Wishbone peripheral
+- CSR-based peripheral
+- Memory-mapped accelerator
+- Firmware-controlled hardware module
 
-Mô phỏng bằng Verilator/Icarus
-        |
-        v
-Tích hợp LiteX SoC
-        |
-        v
-Build bitstream
-        |
-        v
-Nạp lên FPGA
-        |
-        v
-Chạy firmware thật
+### 15.7. FPGA Deployment
 
-### 14.8. Ứng dụng nhận dạng ảnh đơn giản
+After simulation is stable, the project can be deployed to a real FPGA board.
 
-Khi hệ thống hoàn thiện hơn, có thể dùng để nhận dạng các mẫu ảnh nhỏ như:
+Possible development flow:
 
-chữ số đơn giản
-ký tự nhị phân
-biên ảnh
-mẫu đen trắng 8x8 hoặc 16x16
+```text
+RTL simulation
+      |
+      v
+SoC integration
+      |
+      v
+Bitstream generation
+      |
+      v
+FPGA programming
+      |
+      v
+Firmware execution on real hardware
+```
 
-## 15. Hạn chế hiện tại
+### 15.8. Simple Image Recognition
 
-Phiên bản hiện tại còn một số giới hạn:
+In the future, this project may be extended for simple image recognition tasks such as:
 
-Chỉ hỗ trợ input 5x5
-Chỉ hỗ trợ kernel 3x3
-Chỉ có một lớp convolution
-Chưa có bias
-Chưa có ReLU
-Chưa có pooling
-Chưa hỗ trợ ảnh thật
-Chưa tối ưu pipeline
-Chủ yếu phục vụ mục đích học tập và mô phỏng
+- Binary image classification
+- Edge detection
+- Small pattern recognition
+- Simple handwritten digit recognition
+- 8x8 or 16x16 image feature extraction
 
-## 16. Kết luận
+---
 
-Project cnn_simple_vanthuc_24161421 là một bước khởi đầu để hiểu cách xây dựng một bộ tăng tốc CNN đơn giản trên hệ thống RISC-V SoC.
+## 16. Conclusion
 
-Dự án cho thấy cách CPU và phần cứng chuyên dụng có thể phối hợp với nhau:
+`cnn_simple_vanthuc_24161421` is a simple but meaningful project for learning how a CNN accelerator can be connected to a RISC-V SoC.
 
-CPU điều khiển
-CNN tính toán
-RAM lưu chương trình và dữ liệu
-Bus kết nối toàn hệ thống
+The project shows how software and hardware cooperate:
 
-Mặc dù mô hình còn đơn giản, project này là nền tảng tốt để phát triển các hệ thống AI Accelerator phức tạp hơn trong tương lai.
+```text
+CPU controls the system
+CNN accelerator performs computation
+RAM stores firmware and data
+Wishbone bus connects all components
+```
+
+Although the current CNN model is still simple, it provides a strong foundation for understanding hardware acceleration, SoC design, and AI-oriented digital hardware.
+
+---
 
 ## 17. Author
 
-Van Thuc
-Project: CNN Simple Accelerator on RISC-V SoC
-Repository: cnn_simple_vanthuc_24161421
-
-## 18. Contact
-
-Nguyen Van Thuc  MSSV 24161421
-Gmail: chuantinh2407@gmail.com
-Phone numbber : 84+ 961072793
-
+**Van Thuc**  
+Project: CNN Simple Accelerator on RISC-V SoC  
+Repository: `cnn_simple_vanthuc_24161421`
