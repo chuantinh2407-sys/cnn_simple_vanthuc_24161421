@@ -1,0 +1,17 @@
+
+# Ignore simulation directories
+sim/
+sim_*
+*.sim
+*.log
+*.jou
+*.wdb
+xsim.dir
+vivado.log
+vivado.jou
+webtalk.log
+webtalk.jou
+xvlog.pb
+xvhdl.pb
+.Xil/
+*.str

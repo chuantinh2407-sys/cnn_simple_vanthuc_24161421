@@ -1,0 +1,76 @@
+
+Discarded input sections
+
+ .text          0x00000000        0x0 /tmp/cckHFg7w.o
+ .data          0x00000000        0x0 /tmp/cckHFg7w.o
+ .bss           0x00000000        0x0 /tmp/cckHFg7w.o
+ .text          0x00000000        0x0 /tmp/cc7KUecC.o
+ .data          0x00000000        0x0 /tmp/cc7KUecC.o
+ .data          0x00000000        0x0 /tmp/cccKA7tC.o
+ .bss           0x00000000        0x0 /tmp/cccKA7tC.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+RAM              0x00000000         0x00010000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /tmp/cckHFg7w.o
+LOAD /tmp/cc7KUecC.o
+LOAD /tmp/cccKA7tC.o
+
+.text           0x00000000      0x234
+ *(.init)
+ .init          0x00000000       0x28 /tmp/cckHFg7w.o
+                0x00000000                _start
+ *(.text*)
+ .text.startup  0x00000028       0xf0 /tmp/cc7KUecC.o
+                0x00000028                main
+ .text          0x00000118       0x94 /tmp/cccKA7tC.o
+                0x00000118                memcpy
+                0x0000013c                memset
+                0x00000158                memmove
+ *(.rodata*)
+ .rodata        0x000001ac       0x88 /tmp/cc7KUecC.o
+
+.rela.dyn       0x00000234        0x0
+ .rela.init     0x00000234        0x0 /tmp/cckHFg7w.o
+
+.data
+ *(.data*)
+
+.bss            0x00000234       0x24
+                0x00000234                        _sbss = .
+ *(.bss*)
+ .bss           0x00000234       0x24 /tmp/cc7KUecC.o
+                0x00000234                result_store
+ *(COMMON)
+                0x00000258                        _ebss = .
+                0x00000258                        . = ALIGN (0x4)
+                0x00000258                        _end = .
+                0x00010000                        _stack_top = (ORIGIN (RAM) + LENGTH (RAM))
+OUTPUT(sim/output/firmware.elf elf32-littleriscv)
+
+.riscv.attributes
+                0x00000000       0x1c
+ .riscv.attributes
+                0x00000000       0x1a /tmp/cckHFg7w.o
+ .riscv.attributes
+                0x0000001a       0x1c /tmp/cc7KUecC.o
+ .riscv.attributes
+                0x00000036       0x1c /tmp/cccKA7tC.o
+
+.comment        0x00000000       0x33
+ .comment       0x00000000       0x33 /tmp/cc7KUecC.o
+                                 0x34 (size before relaxing)
+ .comment       0x00000033        0x0 /tmp/cccKA7tC.o
+                                 0x34 (size before relaxing)
+
+.note.GNU-stack
+                0x00000000        0x0
+ .note.GNU-stack
+                0x00000000        0x0 /tmp/cc7KUecC.o
+ .note.GNU-stack
+                0x00000000        0x0 /tmp/cccKA7tC.o
