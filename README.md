@@ -562,6 +562,8 @@ Although the current CNN model is still simple, it provides a strong foundation 
 
 ## 17. Author
 
-**Van Thuc**  
+**Van Thuc**  **24161421**
 Project: CNN Simple Accelerator on RISC-V SoC  
 Repository: `cnn_simple_vanthuc_24161421`
+Phone: `84+ 961072793`
+Gmail: `chuantinh2407@gmail.com`
