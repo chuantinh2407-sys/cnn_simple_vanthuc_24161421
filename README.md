@@ -429,12 +429,9 @@ Van Thuc
 Project: CNN Simple Accelerator on RISC-V SoC
 Repository: cnn_simple_vanthuc_24161421
 
-=================================================
-
 18. Contact
 
 Nguyen Van Thuc  MSSV 24161421
-gmail: chuantinh2407@gmail.com
-sdt: 84+ 961072793
+Gmail: chuantinh2407@gmail.com
+Phone numbber : 84+ 961072793
 
-==================================================
