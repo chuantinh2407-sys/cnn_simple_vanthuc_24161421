@@ -33,12 +33,13 @@ Ví dụ, với ảnh đầu vào dạng ma trận:
 1 2 3 4 5
 1 2 3 4 5
 1 2 3 4 5
-
+```
 và kernel 3x3:
+```
 -1 0 1
 -1 0 1
 -1 0 1
-
+```
 phép tích chập sẽ lấy từng vùng 3x3 của ảnh đầu vào, nhân với kernel, sau đó cộng lại để tạo ra một giá trị đầu ra.
 
 Trong project này, mô hình CNN được đơn giản hóa để dễ hiểu và dễ mô phỏng trên phần cứng.
@@ -57,6 +58,7 @@ Mô phỏng toàn bộ hệ thống để quan sát luồng dữ liệu.
 4. Kiến trúc tổng quan hệ thống
 
 Hệ thống gồm các thành phần chính:
+```
 +------------------+
 |   Firmware C     |
 |  chạy trên CPU   |
@@ -80,7 +82,7 @@ Hệ thống gồm các thành phần chính:
 |      RAM         |    | CNN Accelerator  |
 | Instruction/Data |    |  Verilog module  |
 +------------------+    +------------------+
-
+```
 CPU RISC-V không trực tiếp tính toán CNN. CPU chỉ làm nhiệm vụ:
 
 ghi dữ liệu input vào CNN
@@ -92,7 +94,7 @@ chờ CNN tính xong
 Khối CNN Accelerator sẽ đảm nhiệm phần tính toán chính.
 
 5. Cấu trúc thư mục
-
+```
 cnn_simple_vanthuc_24161421/
 │
 ├── firmware/
@@ -122,7 +124,7 @@ cnn_simple_vanthuc_24161421/
 ├── Makefile
 ├── README.md
 └── .gitignore
-
+```
 Ý nghĩa các thư mục:
 | Thư mục                 | Chức năng                                            |
 | ----------------------- | ---------------------------------------------------- |
@@ -175,7 +177,7 @@ Bước 7: Đọc 9 giá trị output
 Bước 8: Lưu kết quả vào result_store
 
 Luồng dữ liệu:
-
+```
 main.c
   |
   | ghi input, kernel
@@ -189,7 +191,7 @@ Output buffer
   | CPU đọc lại
   v
 result_store[9]
-
+```
 8. Công thức tích chập
 
 Với input 5x5 và kernel 3x3, output tạo ra có kích thước:
@@ -200,7 +202,7 @@ Output size = Input size - Kernel size + 1
 Do đó output là ma trận 3x3, gồm 9 giá trị.
 
 Công thức tổng quát:
-
+```
 output[y][x] =
     input[y+0][x+0] * kernel[0][0] +
     input[y+0][x+1] * kernel[0][1] +
@@ -211,7 +213,7 @@ output[y][x] =
     input[y+2][x+0] * kernel[2][0] +
     input[y+2][x+1] * kernel[2][1] +
     input[y+2][x+2] * kernel[2][2]
-
+```
 9. Ý nghĩa kết quả
 
 Trong mô hình hiện tại, kết quả tính ra có thể là các giá trị giống nhau, ví dụ toàn bộ output đều bằng 6.
